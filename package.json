@@ -1,0 +1,45 @@
+{
+  "name": "chilizburn",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "db:push": "prisma db push",
+    "burns:ingest": "node scripts/ingest-burns.mjs",
+    "burns:ingest:dry": "node scripts/ingest-burns.mjs --dry-run",
+    "burns:cron": "node scripts/cron-burns.mjs",
+    "burns:trigger:local": "node -e \"fetch('http://localhost:3000/api/internal/ingest/burns?dryRun=1',{headers:{'x-cron-secret':process.env.INGESTION_CRON_SECRET||''}}).then(async(r)=>{console.log(r.status);console.log(await r.text())}).catch((e)=>{console.error(e);process.exit(1)})\""
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.8.0",
+    "next": "16.2.3",
+    "node-cron": "^4.2.1",
+    "pg": "^8.20.0",
+    "prisma": "^7.7.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

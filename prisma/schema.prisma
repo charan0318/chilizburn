@@ -1,0 +1,33 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BurnType {
+  TOKEN_BURN
+  TREASURY_BURN
+  MANUAL_BURN
+}
+
+model Burn {
+  id          BigInt   @id @default(autoincrement())
+  txHash      String   @unique @map("tx_hash")
+  amountRaw   String   @map("amount_raw")
+  amountChz   Decimal  @map("amount_chz") @db.Decimal(30, 8)
+  timestamp   DateTime
+  blockNumber Int      @map("block_number")
+  fromAddress String   @map("from_address")
+  usdValue    Decimal? @map("usd_value") @db.Decimal(30, 8)
+  burnType    BurnType @default(TOKEN_BURN) @map("burn_type")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([timestamp])
+  @@index([blockNumber])
+  @@index([burnType])
+  @@map("burns")
+}
