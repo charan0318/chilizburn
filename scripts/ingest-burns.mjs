@@ -552,7 +552,8 @@ async function upsertBurn(candidate, dryRun) {
       ? (Number(candidate.amountChz) * priceUsd).toFixed(8)
       : null;
 
-  const payload = {
+  // Create payload: includes all financial fields (immutable after creation)
+  const createPayload = {
     txHash: candidate.txHash.toLowerCase(),
     amountRaw: candidate.amountRaw,
     amountChz: candidate.amountChz,
@@ -563,39 +564,34 @@ async function upsertBurn(candidate, dryRun) {
     burnType: candidate.burnType,
   };
 
+  // Update payload: excludes financial fields to preserve historical snapshot
+  // Only update non-financial fields like burnType if needed for corrections
+  const updatePayload = {
+    burnType: candidate.burnType,
+  };
+
   if (dryRun) {
-    return { status: "dry-run", payload };
+    return { status: "dry-run", payload: createPayload };
   }
 
-  const updated = await runPrismaWithRetry(() =>
-    prisma.burn.updateMany({
-      where: { txHash: payload.txHash },
-      data: payload,
+  // Check if record already exists before upsert to track insert vs update
+  const existing = await runPrismaWithRetry(() =>
+    prisma.burn.findUnique({
+      where: { txHash: createPayload.txHash },
     })
   );
 
-  if (updated.count > 0) {
-    return { status: "updated" };
-  }
+  const isNewRecord = !existing;
 
-  try {
-    await runPrismaWithRetry(() => prisma.burn.create({ data: payload }));
-  } catch (error) {
-    if (!isUniqueViolation(error)) {
-      throw error;
-    }
+  await runPrismaWithRetry(() =>
+    prisma.burn.upsert({
+      where: { txHash: createPayload.txHash },
+      create: createPayload,
+      update: updatePayload,
+    })
+  );
 
-    await runPrismaWithRetry(() =>
-      prisma.burn.updateMany({
-        where: { txHash: payload.txHash },
-        data: payload,
-      })
-    );
-
-    return { status: "updated" };
-  }
-
-  return { status: "inserted" };
+  return { status: isNewRecord ? "inserted" : "updated" };
 }
 
 function parseArgs(argv) {

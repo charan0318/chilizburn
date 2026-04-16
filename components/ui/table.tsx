@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Info } from "lucide-react";
 
 import type { BurnRecord } from "@/types/burn";
 
@@ -14,6 +15,7 @@ type SortKey = "date" | "amount" | "usd";
 export function BurnsTable({ burns, showControls = true }: BurnsTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const sortedBurns = useMemo(() => {
     if (!showControls) return burns;
@@ -71,7 +73,7 @@ export function BurnsTable({ burns, showControls = true }: BurnsTableProps) {
                 : "border-white/10 bg-white/[0.02] text-zinc-400 hover:text-zinc-200"
             }`}
           >
-            Sort by USD
+            Sort by USD Value
           </button>
           <button
             type="button"
@@ -108,7 +110,21 @@ export function BurnsTable({ burns, showControls = true }: BurnsTableProps) {
                 <p className="mt-1 font-mono text-sm text-zinc-100">{burn.amountChz.toLocaleString()} CHZ</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-zinc-500">USD</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-zinc-500">USD Value</p>
+                  <div
+                    onMouseEnter={() => setTooltipVisible(true)}
+                    onMouseLeave={() => setTooltipVisible(false)}
+                    className="relative"
+                  >
+                    <Info className="h-3 w-3 text-rose-500/60 cursor-help hover:text-rose-400 transition-colors" />
+                    {tooltipVisible && (
+                      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-rose-950/95 border border-rose-500/50 rounded px-2 py-1 text-[10px] text-rose-100 whitespace-nowrap z-50 pointer-events-none shadow-lg font-medium">
+                        Approx. USD value at burn time
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <p className="mt-1 font-mono text-sm text-zinc-100">${burn.usdValue.toLocaleString()}</p>
               </div>
             </div>
@@ -122,7 +138,23 @@ export function BurnsTable({ burns, showControls = true }: BurnsTableProps) {
             <tr>
               <th className="px-4 py-3">Date</th>
               <th className="px-4 py-3">Amount (CHZ)</th>
-              <th className="px-4 py-3">USD Value</th>
+              <th className="px-4 py-3 relative">
+                <div className="inline-flex items-center gap-2">
+                  <span>USD Value</span>
+                  <div
+                    onMouseEnter={() => setTooltipVisible(true)}
+                    onMouseLeave={() => setTooltipVisible(false)}
+                    className="relative"
+                  >
+                    <Info className="h-3.5 w-3.5 text-rose-500/60 cursor-help hover:text-rose-400 transition-colors" />
+                    {tooltipVisible && (
+                      <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 bg-rose-950/95 border border-rose-500/50 rounded px-3 py-2 text-[11px] text-rose-100 whitespace-nowrap z-50 pointer-events-none shadow-lg font-medium">
+                        Approx. USD value at burn time
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </th>
               <th className="px-4 py-3">TX Link</th>
             </tr>
           </thead>
