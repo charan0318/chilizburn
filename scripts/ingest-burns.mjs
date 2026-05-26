@@ -677,6 +677,11 @@ export async function runBurnIngestion(options = {}) {
           if (config.logVerbose) {
             console.warn(`[invalid] ${candidate.txHash}: ${result.reason}`);
           }
+        } else if (result.status === "dry-run") {
+          summary.skipped += 1;
+          if (config.logVerbose) {
+            console.log(`[dry-run] ${candidate.txHash}: ${result.payload.amountChz} CHZ at ${candidate.timestamp}`);
+          }
         } else {
           summary.skipped += 1;
         }
