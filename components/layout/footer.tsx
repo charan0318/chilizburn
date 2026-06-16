@@ -25,7 +25,7 @@ export function Footer() {
           rel="noopener noreferrer"
           className="rounded-lg bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-300 border border-rose-500/30 transition-colors hover:bg-rose-500/20 hover:text-rose-200"
         >
-          Telegram
+          Feedback
         </Link>
       </div>
     </footer>

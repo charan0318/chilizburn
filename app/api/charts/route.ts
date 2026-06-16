@@ -10,6 +10,7 @@ export async function GET() {
       data: {
         cumulative: charts.cumulative,
         monthly: charts.monthly,
+        burnVsPrice: charts.burnVsPrice,
       },
     },
     {
